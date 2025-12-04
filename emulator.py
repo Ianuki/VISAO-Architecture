@@ -1,8 +1,8 @@
 RA = 0
 RB = 0
-R0 = 0 # Read only
 
 registers = {
+    0: 0,
     1: 0,
     2: 0,
     3: 0,
@@ -16,7 +16,8 @@ def write_register(register, value):
         print("Segmentation fault.")
         halt = True
     else:
-        registers[register] = value
+        if register > 0:
+            registers[register] = value
 
 def read_register(register):
     if not register in registers:
@@ -101,4 +102,5 @@ else:
         bin = file.read()
 
     execute(bin, sys.argv[1])
+
 
