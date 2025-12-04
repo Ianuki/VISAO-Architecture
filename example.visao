@@ -1,0 +1,3 @@
+sta 10
+stb 5
+add r1
