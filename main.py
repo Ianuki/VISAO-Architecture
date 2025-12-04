@@ -21,11 +21,15 @@ REGISTERS_TABLE = {
     "r4": "0100",
 }
 
-def assemble(source):
+def assemble(source, filename):
     lines = source.split("\n")
     output = ""
 
     for line in lines:
+        if len(line) > 0:
+            if line[0] == "#":
+                continue
+
         words = line.split(" ")
 
         if len(words) >= 2:
@@ -53,17 +57,17 @@ def assemble(source):
     
     data = "hello world"
 
-    with open("o.bisao", "w") as file:
+    with open(filename + ".bisao", "w") as file:
         file.write(output)
 
 import sys
 
 source_code = None
 
-if len(sys.argv) < 2:
-    print("No file provided.")
+if len(sys.argv) < 3:
+    print("Missing arguments.")
 else:
     with open(sys.argv[1], "r") as file:
         source_code = file.read()
 
-    assemble(source_code)
+    assemble(source_code, sys.argv[2])
