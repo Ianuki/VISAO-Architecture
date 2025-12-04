@@ -1,0 +1,20 @@
+# Setup R1 and R2
+sta 1
+stb 1
+or r1
+or r2
+
+# First iteration
+lda r1
+ldb r2
+add r2
+
+# Second iteration
+lda r1
+ldb r2
+add r1
+
+# Third iteration
+lda r1
+ldb r2
+add r2
