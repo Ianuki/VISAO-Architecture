@@ -5,6 +5,7 @@ CPU design for survival Minecraft Servers.
 
 ## Instruction set:
 
+```
 NOP   0000  -> REG
 AND   0001  -> REG
 OR    0010  -> REG
@@ -17,4 +18,5 @@ STA   1000  -> VAL
 LDA   1001  -> REG
 STB   1010  -> VAL
 LDB   1011  -> REG
+```
 
