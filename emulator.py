@@ -38,9 +38,11 @@ def op_stb(value):
     RB = value
 
 def op_lda(register):
+    global RA
     RA = read_register(register)
 
 def op_ldb(register):
+    global RB
     RB = read_register(register)
 
 def op_add(register):
@@ -69,7 +71,7 @@ instructions = {
     8: op_sta,
     9: op_lda,
     10: op_stb,
-    11: op_lda,
+    11: op_ldb,
     6: op_add,
     7: op_ls,
     1: op_and,
@@ -79,12 +81,14 @@ instructions = {
     5: op_xor
 }
 
-def execute(bin):
+def execute(bin, filename):
     words = bin.split(" ")
 
     for word_i in range(len(words) // 2):
         instructions[int(words[word_i * 2], 2)](int(words[word_i * 2 + 1], 2))
-        print(f"R1 = {registers[1]} | R2 = {registers[2]}")
+
+    with open(filename + ".visaolog", "w") as file:
+        file.write(f"R1: {registers[1]}\nR2: {registers[2]}")
 
 import sys
 
@@ -96,5 +100,5 @@ else:
     with open(sys.argv[1], "r") as file:
         bin = file.read()
 
-    execute(bin)
+    execute(bin, sys.argv[1])
 
