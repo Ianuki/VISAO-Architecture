@@ -1,5 +1,6 @@
 RA = 0
 RB = 0
+zero_flag = True
 
 registers = {
     0: 0,
@@ -9,15 +10,16 @@ registers = {
     4: 0
 }
 
+jump = False
 halt = False
+pc = 0
 
 def write_register(register, value):
     if not register in registers:
         print("Segmentation fault.")
         halt = True
     else:
-        if register > 0:
-            registers[register] = value
+        registers[register] = value
 
 def read_register(register):
     if not register in registers:
@@ -27,7 +29,7 @@ def read_register(register):
         return registers[register]
 
 # Instructions
-def op_nop(scrap):
+def op_nop(null):
     pass
 
 def op_sta(value):
@@ -47,9 +49,17 @@ def op_ldb(register):
     RB = read_register(register)
 
 def op_add(register):
-    write_register(register, RA + RB)
+    global zero_flag
 
-def op_ls(register):
+    result = RA + RB
+    if result == 0:
+        zero_flag = True
+    else:
+        zero_flag = False
+
+    write_register(register, result)
+
+def op_rsh(register):
     write_register(register, (RA << 1) & 0b1111)
     
 def op_and(register):
@@ -67,26 +77,71 @@ def op_nor(register):
 def op_xor(register):
     write_register(register, RA ^ RB)
 
+def op_jnz(value):
+    if zero_flag == False:
+        global jump
+        global pc
+        pc = value
+        jump = True
+
+def op_hlt(null):
+    global halt
+    halt = True
+
+def op_sub(register):
+    global zero_flag
+
+    result = RA - RB
+    if result == 0:
+        zero_flag = True
+    else:
+        zero_flag = False
+
+    write_register(register, result)
+
+def op_out(register):
+    print(registers[register])
+
+def op_stm(value):
+    pass
+
+def op_ldm(register):
+    pass
+
 instructions = {
     0: op_nop,
-    8: op_sta,
-    9: op_lda,
-    10: op_stb,
-    11: op_ldb,
-    6: op_add,
-    7: op_ls,
-    1: op_and,
-    2: op_or,
-    3: op_nand,
-    4: op_nor,
-    5: op_xor
+    1: op_hlt,
+    2: op_sta,
+    3: op_lda,
+    4: op_stb,
+    5: op_ldb,
+    6: op_and,
+    7: op_or,
+    8: op_nor,
+    9: op_rsh,
+    10: op_add,
+    11: op_sub,
+    12: op_jnz,
+    13: op_out,
+    14: op_stm,
+    15: op_ldm
 }
 
 def execute(bin, filename):
-    words = bin.split(" ")
+    global pc
+    global halt
+    global jump
 
-    for word_i in range(len(words) // 2):
-        instructions[int(words[word_i * 2], 2)](int(words[word_i * 2 + 1], 2))
+    words = [w for w in bin.split(" ") if w != ""]
+    pc = 0
+
+    while not halt:
+        instructions[int(words[pc * 2], 2)](int(words[pc * 2 + 1], 2))
+        
+        if jump:
+            jump = False
+        else:
+            pc += 1
 
     with open(filename + ".visaolog", "w") as file:
         file.write(f"R1: {registers[1]}\nR2: {registers[2]}")
@@ -102,5 +157,4 @@ else:
         bin = file.read()
 
     execute(bin, sys.argv[1])
-
-
+    
