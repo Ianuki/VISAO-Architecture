@@ -5,17 +5,35 @@ CPU design for survival Minecraft Servers.
 
 ## Programming guide:
 
+### Basic operations
+
 Before doing any operation, you must set the value of RA and RB.
 STA and STB set their respective registers to a literal number.
 LDA and LDB sets them to the value stored in another indexable register.
 
-### Example:
 ```
 sta 6    ; Set RA to 6
 stb 7    ; Set RB to 7
 add r1   ; Add RA and RB and store it in R1
 out r1   ; Send the value stored in R1 to the standard output
 hlt      ; Halt the program counter
+```
+
+### Labels
+
+Labels are declared in their own lines and represent the numerical position of the next instruction.
+You can jump back to labels using JNZ, JZ or JMP. JNZ and JZ operate using the zero flag.
+Indentation is not required but hels with readability.
+
+```
+sta 10            ; Set RA to 10
+stb 1             ; Set RB to 1
+
+.counting         ; Declare label "counting"
+  sub r1          ; Subtract RB from RA and store it in R1
+  jnz counting    ; Jump back to counting if the ZF = 1
+
+hlt               ; Halt the program counter
 ```
 
 ## Instruction set:
