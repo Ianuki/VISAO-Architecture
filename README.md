@@ -68,6 +68,4 @@ R2 -> Free to use
 R3 -> Free to use
 R4 -> Free to use
 R5 -> Free to use
-R6 -> Free to use
-R7 -> Free to use
 ```
