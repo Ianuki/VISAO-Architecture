@@ -1,28 +1,28 @@
 TOKENS_TABLE = {
-    "nop": {"bin": "0000", "arg_type":"null"},
-    "hlt": {"bin": "0001", "arg_type":"null"},
-    "sta": {"bin": "0010", "arg_type":"val"},
-    "lda": {"bin": "0011", "arg_type":"reg"},
-    "stb": {"bin": "0100", "arg_type":"val"},
-    "ldb": {"bin": "0101", "arg_type":"reg"},
-    "and": {"bin": "0110", "arg_type":"reg"},
-    "orr": {"bin": "0111", "arg_type":"reg"},
-    "nor": {"bin": "1000", "arg_type":"reg"},
-    "rsh": {"bin": "1001", "arg_type":"reg"},
-    "add": {"bin": "1010", "arg_type":"reg"},
-    "sub": {"bin": "1011", "arg_type":"reg"},
-    "jnz": {"bin": "1100", "arg_type":"val"},
-    "out": {"bin": "1101", "arg_type":"reg"},
-    "stm": {"bin": "1110", "arg_type":"val"},
-    "ldm": {"bin": "1111", "arg_type":"reg"}
+    "nop": {"bin": "00000000", "arg_type":"null"},
+    "hlt": {"bin": "00000001", "arg_type":"null"},
+    "sta": {"bin": "00000010", "arg_type":"val"},
+    "lda": {"bin": "00000011", "arg_type":"reg"},
+    "stb": {"bin": "00000100", "arg_type":"val"},
+    "ldb": {"bin": "00000101", "arg_type":"reg"},
+    "and": {"bin": "00000110", "arg_type":"reg"},
+    "orr": {"bin": "00000111", "arg_type":"reg"},
+    "nor": {"bin": "00001000", "arg_type":"reg"},
+    "xor": {"bin": "00001001", "arg_type":"reg"},
+    "add": {"bin": "00001010", "arg_type":"reg"},
+    "sub": {"bin": "00001011", "arg_type":"reg"},
+    "jnz": {"bin": "00001100", "arg_type":"val"},
+    "jez": {"bin": "00001101", "arg_type":"val"},
+    "stm": {"bin": "00001110", "arg_type":"reg"},
+    "ldm": {"bin": "00001111", "arg_type":"reg"}
 }
 
 REGISTERS_TABLE = {
-    "r0": "0000",
-    "r1": "0001",
-    "r2": "0010",
-    "r3": "0011",
-    "r4": "0100",
+    "r0": "00000000",
+    "r1": "00000001",
+    "r2": "00000010",
+    "r3": "00000011",
+    "r4": "00000100",
 }
 
 def assemble(source, filename):
@@ -36,16 +36,35 @@ def assemble(source, filename):
             if line[0] == ";":
                 continue
 
+            line = line.lstrip()
+            words = line.split(" ")
+
+            if len(words) >= 1 and words[0] != "":
+                instruction = words[0]      
+
+                if instruction.startswith("."):
+                    name = line[1:]
+                    name = name.rstrip()
+                    labels[name] = line_count
+                    continue
+            
+            line_count += 1
+
+    line_count = 0
+    print(labels)
+
+    for line in lines:
+        if len(line) > 0:
+            if line[0] == ";":
+                continue
+
         line = line.lstrip()
         words = line.split(" ")
 
         if len(words) >= 1 and words[0] != "":
             instruction = words[0]      
 
-            if instruction.startswith("."):
-                name = line[1:]
-                name = name.rstrip()
-                labels[name] = line_count 
+            if instruction.startswith("."): 
                 continue
 
             if not instruction in TOKENS_TABLE:
@@ -57,7 +76,7 @@ def assemble(source, filename):
 
             if TOKENS_TABLE[instruction]["arg_type"] == "null":
 
-                output += "0000 "
+                output += "00000000 "
                 continue
 
             if TOKENS_TABLE[instruction]["arg_type"] == "reg":
@@ -71,7 +90,7 @@ def assemble(source, filename):
             elif TOKENS_TABLE[instruction]["arg_type"] == "val":
                 param = words[1]
                 
-                if instruction == "jnz" and not param.isdigit():
+                if instruction == "jnz" or instruction == "jez" and not param.isdigit():
                     if not param in labels:
                         print(f"Label {param} does not exist")
                         return
@@ -82,7 +101,7 @@ def assemble(source, filename):
                         print("\nValue parameter is not a number: ", param)
                         return
                 
-                output += format(int(param), '04b') + " "
+                output += format(int(param) & 0xFF, '08b') + " "
     
     data = "hello world"
 
