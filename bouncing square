@@ -1,0 +1,112 @@
+; M(1): Horizontal speed
+; M(2): Vertical speed
+; M(87): X
+; M(88): Y
+; M(89): Update Display
+
+sta 1
+stb 0
+add r1
+stm r1
+sta 2
+stm r1
+
+sta 0
+stb 0
+sub r0
+jez update
+
+.invertHorizontal
+    sta 1
+    ldm r3 
+    lda r3 
+    stb 254
+    xor r3
+    sta 1
+    stm r3
+
+    sta 0
+    stb 0
+    sub r0
+    jez returnHorizontal
+
+.invertVertical
+    sta 2
+    ldm r3 
+    lda r3 
+    stb 254
+    xor r3
+    sta 2
+    stm r3
+
+    sta 0
+    stb 0
+    sub r0
+    jez returnVertical
+
+.update
+    sta 87 
+    ldm r3
+    sta 1
+    ldm r4
+    lda r3
+    ldb r4 
+    add r3
+    sta 87
+    stm r3
+
+    sta 87
+    ldm r3 
+    lda r3 
+    stb 19
+    sub r0
+    jez invertHorizontal
+
+    sta 87
+    ldm r3 
+    lda r3 
+    stb 0
+    sub r0
+    jez invertHorizontal
+
+    .returnHorizontal
+
+    sta 88
+    ldm r3
+    sta 2
+    ldm r4
+    lda r3
+    ldb r4 
+    add r3
+    sta 88
+    stm r3
+
+    sta 88
+    ldm r3 
+    lda r3 
+    stb 9
+    sub r0
+    jez invertVertical
+
+    sta 88
+    ldm r3 
+    lda r3 
+    stb 0
+    sub r0
+    jez invertVertical
+
+    .returnVertical
+
+    sta 1
+    stb 0
+    orr r3 
+    sta 89
+    stm r3
+
+    sta 0
+    stb 0
+    add r0
+    jez update
+
+hlt
+
